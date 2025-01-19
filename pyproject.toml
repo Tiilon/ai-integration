@@ -1,0 +1,23 @@
+[project]
+name = "self-learning"
+version = "0.1.0"
+description = "this is for personal practice"
+authors = [
+    {name = "tiilon",email = "tiilon42@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9,^3.13"
+dependencies = [
+    "langchain (>=0.3.14,<0.4.0)",
+    "langchain-community (>=0.3.14,<0.4.0)",
+    "langchain-ollama (>=0.2.2,<0.3.0)",
+    "pypdf (>=5.1.0,<6.0.0)",
+    "bs4 (>=0.0.2,<0.0.3)",
+    "lxml (>=5.3.0,<6.0.0)",
+    "wikipedia (>=1.4.0,<2.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
