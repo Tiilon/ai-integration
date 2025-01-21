@@ -25,8 +25,10 @@ embeddings = OllamaEmbeddings(
 
 vector_db = Chroma.from_documents(chunks_of_text,embeddings)
 
-question = "What did the president say about the John Lewis Voting Rights Act?"
+retriever = vector_db.as_retriever()
 
-response = vector_db.similarity_search(question)
+question = "what did he say about ketanji brown jackson?"
+
+response = retriever.invoke(question)
 
 print(response[0].page_content)

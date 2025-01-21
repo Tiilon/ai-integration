@@ -2,6 +2,9 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 from langchain_chroma import Chroma
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
@@ -25,8 +28,28 @@ embeddings = OllamaEmbeddings(
 
 vector_db = Chroma.from_documents(chunks_of_text,embeddings)
 
-question = "What did the president say about the John Lewis Voting Rights Act?"
+retriever = vector_db.as_retriever()
 
-response = vector_db.similarity_search(question)
+template = """ 
+    Answer the question based on the below context:
+    
+    {context}
+    
+    Question: {question}
+"""
 
-print(response[0].page_content)
+prompt = ChatPromptTemplate.from_template(template)
+
+def format_docs(docs):
+    return "\n\n".join([d.page_content for d in docs])
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+response = chain.invoke("what did he say about ketanji brown jackson?")
+
+print(response)
