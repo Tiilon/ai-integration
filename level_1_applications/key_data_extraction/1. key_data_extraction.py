@@ -1,7 +1,7 @@
 from langchain_ollama import ChatOllama
 from typing import Optional, List
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
 
 llm = ChatOllama(model="llama3.2", temperature=0.9)
 
@@ -25,7 +25,7 @@ class Person(BaseModel):
     country: Optional[str] = Field(
         default=None, description="The country of the person if known"
     )
-class Data(BaseModel):
+class People(BaseModel):
     """Extracted data about people."""
 
     # Creates a model so that we can extract multiple entities.
@@ -49,16 +49,16 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 ## Example 1 - Single data
-# chain = prompt | llm.with_structured_output(schema=Person)
+chain = prompt | llm.with_structured_output(schema=Person)
 
-# comment = "I absolutely love this product! It's been a game-changer for my daily routine. The quality is top-notch and the customer service is outstanding. I've recommended it to all my friends and family. - Sarah Johnson, USA"
+comment = "I absolutely love this product! It's been a game-changer for my daily routine. The quality is top-notch and the customer service is outstanding. I've recommended it to all my friends and family. - Sarah Johnson, USA"
 
-# response = chain.invoke({"text": comment})
+response = chain.invoke({"text": comment})
 # print(response)
 
 
 ## Example 2 - Multiple data
-chain = prompt | llm.with_structured_output(schema=Data)
+chain = prompt | llm.with_structured_output(schema=People)
 
 # Example input text that mentions multiple people
 text_input = """
@@ -66,4 +66,4 @@ Alice Johnson from Canada recently reviewed a book she loved. Meanwhile, Bob Smi
 """
 
 response = chain.invoke({"text": text_input})
-print(response)
+# print(response)
