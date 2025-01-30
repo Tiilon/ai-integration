@@ -2,8 +2,8 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
 
-llm = ChatOllama(model="llama3.2:3b", temperature=0.9)
-embeddings = OllamaEmbeddings(model="llama3.2:3b")
+llm = ChatOllama(model="llama3.2", temperature=0.9)
+embeddings = OllamaEmbeddings(model="llama3.2")
 
 documents = [
     Document(
@@ -35,4 +35,34 @@ retriever = vector_db.as_retriever(
     search_kwargs={"k": 1},
 )
 
-print(retriever.batch(["John", "Robert"]))
+# print(retriever.batch(["John", "Robert"]))
+
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+
+message = """
+Answer this question using the provided context only.
+
+{question}
+
+Context:
+{context}
+"""
+
+prompt = ChatPromptTemplate.from_messages([("human", message)])
+
+chain = {
+    "context": retriever, 
+    "question": RunnablePassthrough()
+    } | prompt | llm
+
+response = chain.invoke("tell me about Jackie")
+
+print("\n----------\n")
+
+print("tell me about Jackie (simple retriever):")
+
+print("\n----------\n")
+print(response.content)
+
+print("\n----------\n")
